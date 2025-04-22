@@ -1,144 +1,159 @@
-import socket
-import threading
-import logging
-import time
+from gevent import monkey
+monkey.patch_all()
 
-# Server Configuration
-HOST = '127.0.0.1'  # Localhost
-PORT = 12347        # Port to listen on
+from flask import Flask, render_template, request, jsonify, session
+from flask_socketio import SocketIO, emit, join_room, leave_room
+import random
 
-# List of available games
-GAMES = ["Snake & Ladders", "Ludo", "Chess", "Tic-Tac-Toe", "Rock-Paper-Scissors"]
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key'
+socketio = SocketIO(app, async_mode='gevent')
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# Game states
+games = {
+    'tic_tac_toe': {},  # {room_id: {board: [], current_player: 'X', players: [], game_over: False}}
+    'snake': {}  # {room_id: {snake: [], food: {}, score: 0, game_over: False}}
+}
 
-def tic_tac_toe(client_socket):
-    client_socket.send("Starting Tic-Tac-Toe...\n".encode())
-    board = [" "] * 9
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    def display_board():
-        return f"\n{board[0]} | {board[1]} | {board[2]}\n---------\n{board[3]} | {board[4]} | {board[5]}\n---------\n{board[6]} | {board[7]} | {board[8]}\n"
+# Tic Tac Toe Logic
+def check_winner(board):
+    # Check rows, columns and diagonals
+    win_combinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
+        [0, 4, 8], [2, 4, 6]  # Diagonals
+    ]
+    for combo in win_combinations:
+        if board[combo[0]] and board[combo[0]] == board[combo[1]] == board[combo[2]]:
+            return board[combo[0]]
+    if '' not in board:  # Check for draw
+        return 'draw'
+    return None
 
-    def check_winner():
-        win_conditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
-            [0, 4, 8], [2, 4, 6]              # Diagonals
-        ]
-        for condition in win_conditions:
-            if board[condition[0]] == board[condition[1]] == board[condition[2]] != " ":
-                return board[condition[0]]
-        return None
+@socketio.on('join_tictactoe')
+def handle_tictactoe_join(data):
+    room = data['room']
+    join_room(room)
+    if room not in games['tic_tac_toe']:
+        games['tic_tac_toe'][room] = {
+            'board': [''] * 9,
+            'current_player': 'X',
+            'players': [],
+            'game_over': False
+        }
+    games['tic_tac_toe'][room]['players'].append(request.sid)
+    emit('game_joined', {'game': 'tic_tac_toe', 'player': len(games['tic_tac_toe'][room]['players'])})
 
-    turn = "X"
-    for _ in range(9):
-        client_socket.send(display_board().encode())
-        client_socket.send(f"{turn}'s turn. Enter position (1-9):\n".encode())
-        try:
-            move = int(client_socket.recv(1024).decode().strip()) - 1
-            if board[move] == " ":
-                board[move] = turn
-                winner = check_winner()
-                if winner:
-                    client_socket.send(display_board().encode())
-                    client_socket.send(f"{winner} wins!\n".encode())
-                    return
-                turn = "O" if turn == "X" else "X"
-            else:
-                client_socket.send("Invalid move. Try again.\n".encode())
-        except (ValueError, IndexError):
-            client_socket.send("Invalid input. Enter a number between 1 and 9.\n".encode())
-
-    client_socket.send(display_board().encode())
-    client_socket.send("It's a draw!\n".encode())
-
-def rock_paper_scissors(client_socket):
-    client_socket.send("Starting Rock-Paper-Scissors...\n".encode())
-    choices = ["rock", "paper", "scissors"]
-
-    def determine_winner(player, computer):
-        if player == computer:
-            return "It's a tie!"
-        elif (player == "rock" and computer == "scissors") or \
-             (player == "scissors" and computer == "paper") or \
-             (player == "paper" and computer == "rock"):
-            return "You win!"
+@socketio.on('make_move_tictactoe')
+def handle_tictactoe_move(data):
+    room = data['room']
+    position = data['position']
+    game = games['tic_tac_toe'].get(room)
+    
+    if not game or game['game_over'] or position < 0 or position > 8:
+        return
+    
+    if game['board'][position] == '' and request.sid in game['players']:
+        game['board'][position] = game['current_player']
+        winner = check_winner(game['board'])
+        
+        response = {
+            'board': game['board'],
+            'current_player': game['current_player'],
+            'winner': winner if winner != 'draw' else "It's a draw!"
+        }
+        
+        if winner:
+            game['game_over'] = True
         else:
-            return "Computer wins!"
+            game['current_player'] = 'O' if game['current_player'] == 'X' else 'X'
+        
+        emit('move_made', response, room=room)
 
-    while True:
-        client_socket.send("Enter rock, paper, or scissors (or 'quit' to exit):\n".encode())
-        player_choice = client_socket.recv(1024).decode().strip().lower()
-        if player_choice == "quit":
-            client_socket.send("Exiting Rock-Paper-Scissors.\n".encode())
-            break
-        if player_choice not in choices:
-            client_socket.send("Invalid choice. Try again.\n".encode())
-            continue
+# Snake Game Logic
+@socketio.on('join_snake')
+def handle_snake_join(data):
+    room = data['room']
+    join_room(room)
+    if room not in games['snake']:
+        games['snake'][room] = {
+            'snake': [[10, 10]],  # Starting position
+            'food': {'x': random.randint(0, 19), 'y': random.randint(0, 19)},
+            'score': 0,
+            'direction': 'RIGHT',
+            'game_over': False
+        }
+    emit('game_joined', {
+        'game': 'snake',
+        'gameState': games['snake'][room]
+    })
 
-        import random
-        computer_choice = random.choice(choices)
-        result = determine_winner(player_choice, computer_choice)
-        client_socket.send(f"Computer chose {computer_choice}. {result}\n".encode())
+@socketio.on('snake_direction')
+def handle_snake_direction(data):
+    room = data['room']
+    direction = data['direction']
+    game = games['snake'].get(room)
+    
+    if game and not game['game_over']:
+        game['direction'] = direction
 
-def handle_client(client_socket):
-    try:
-        logging.info("Handling new client connection.")
-        # Send the list of games to the client
-        client_socket.send("Welcome to the Multi-Game Platform!\n".encode())
-        client_socket.send("Available games:\n".encode())
-        for idx, game in enumerate(GAMES, start=1):
-            client_socket.send(f"{idx}. {game}\n".encode())
-        client_socket.send("Select a game by entering the number:\n".encode())
+@socketio.on('snake_move')
+def handle_snake_move(data):
+    room = data['room']
+    game = games['snake'].get(room)
+    
+    if not game or game['game_over']:
+        return
 
-        # Ensure the client has time to process the data
-        client_socket.settimeout(30)  # Set a timeout of 30 seconds for receiving data
+    # Get the head position
+    head = game['snake'][0].copy()
+    
+    # Update head position based on direction
+    if game['direction'] == 'UP':
+        head[1] -= 1
+    elif game['direction'] == 'DOWN':
+        head[1] += 1
+    elif game['direction'] == 'LEFT':
+        head[0] -= 1
+    elif game['direction'] == 'RIGHT':
+        head[0] += 1
 
-        # Receive the client's choice
-        choice = client_socket.recv(1024).decode().strip()
-        logging.debug(f"Received raw data from client: {choice}")
-        logging.debug(f"Received choice from client: {choice}")
-        if choice.isdigit() and 1 <= int(choice) <= len(GAMES):
-            selected_game = GAMES[int(choice) - 1]
-            logging.info(f"Client selected game: {selected_game}")
-            client_socket.send(f"You selected: {selected_game}\n".encode())
-
-            if selected_game == "Tic-Tac-Toe":
-                logging.debug("Starting Tic-Tac-Toe game logic.")
-                tic_tac_toe(client_socket)
-            elif selected_game == "Rock-Paper-Scissors":
-                logging.debug("Starting Rock-Paper-Scissors game logic.")
-                rock_paper_scissors(client_socket)
-            else:
-                logging.warning("Game logic not implemented for the selected game.")
-                client_socket.send("Game logic will be implemented here.\n".encode())
+    # Check for collisions with walls
+    if head[0] < 0 or head[0] >= 20 or head[1] < 0 or head[1] >= 20:
+        game['game_over'] = True
+    # Check for self-collision
+    elif head in game['snake'][:-1]:
+        game['game_over'] = True
+    else:
+        # Move snake
+        game['snake'].insert(0, head)
+        
+        # Check if food is eaten
+        if head[0] == game['food']['x'] and head[1] == game['food']['y']:
+            game['score'] += 1
+            # Generate new food position
+            while True:
+                new_food = {
+                    'x': random.randint(0, 19),
+                    'y': random.randint(0, 19)
+                }
+                if [new_food['x'], new_food['y']] not in game['snake']:
+                    game['food'] = new_food
+                    break
         else:
-            logging.warning(f"Invalid game choice received: {choice}")
-            client_socket.send("Invalid choice. Disconnecting.\n".encode())
-            logging.warning("Client made an invalid choice.")
-    except socket.timeout:
-        logging.error("Client did not respond in time. Closing connection.")
-        client_socket.send("Timeout: No response received. Disconnecting.\n".encode())
-    except Exception as e:
-        logging.error(f"Error handling client: {e}")
-    finally:
-        client_socket.close()
-        logging.info("Client connection closed.")
+            game['snake'].pop()
 
-# Main server function
-def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    server.listen(5)
-    print(f"Server started on {HOST}:{PORT}")
+    # Send updated game state
+    emit('game_update', {
+        'snake': game['snake'],
+        'food': game['food'],
+        'score': game['score'],
+        'game_over': game['game_over']
+    }, room=room)
 
-    while True:
-        client_socket, addr = server.accept()
-        print(f"Connection from {addr}")
-        logging.info(f"Connection from {addr}")
-        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
-        client_thread.start()
-
-if __name__ == "__main__":
-    start_server()
+if __name__ == '__main__':
+    socketio.run(app, debug=True)

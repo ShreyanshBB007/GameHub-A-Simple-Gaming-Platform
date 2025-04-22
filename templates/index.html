@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Game Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #1a73e8;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .game-board {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #game-selection {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(26,115,232,0.2);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tictactoe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 8px;
+            margin: 20px auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #1a73e8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s ease;
+            color: #1a73e8;
+        }
+
+        .cell:hover {
+            background-color: #e8f0fe;
+            transform: scale(1.05);
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 25px;
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .winner {
+            color: #34a853;
+            font-size: 1.4em;
+            font-weight: bold;
+            animation: winnerAnimation 1s ease-in-out;
+        }
+
+        #snake-canvas {
+            border-radius: 15px;
+            background-color: #1c1c1c;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        #snake-score {
+            font-size: 24px;
+            color: #34a853;
+            margin: 20px 0;
+        }
+
+        #snake-controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        @keyframes winnerAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi-Game Platform</h1>
+    
+    <div id="game-selection">
+        <h2>Select a Game:</h2>
+        <button onclick="joinGame('tictactoe')">Tic Tac Toe</button>
+        <button onclick="joinGame('snake')">Snake Game</button>
+    </div>
+
+    <div id="tictactoe-board" class="game-board">
+        <h2>Tic Tac Toe</h2>
+        <div class="tictactoe-board">
+            <div class="cell" onclick="makeMove(0)"></div>
+            <div class="cell" onclick="makeMove(1)"></div>
+            <div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div>
+            <div class="cell" onclick="makeMove(4)"></div>
+            <div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div>
+            <div class="cell" onclick="makeMove(7)"></div>
+            <div class="cell" onclick="makeMove(8)"></div>
+        </div>
+        <div id="tictactoe-status" class="status"></div>
+        <button onclick="resetGame('tictactoe')" id="tictactoe-reset" style="display: none;">Play Again</button>
+    </div>
+
+    <div id="snake-board" class="game-board">
+        <h2>Snake Game</h2>
+        <div id="snake-score">Score: 0</div>
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <div id="snake-controls">
+            <p>Use arrow keys to control the snake</p>
+            <button onclick="resetGame('snake')" id="snake-reset" style="display: none;">Play Again</button>
+        </div>
+        <div id="snake-status" class="status"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentGame = '';
+        let currentRoom = '';
+        let gameEnded = false;
+        let snakeGameLoop;
+
+        // Snake game variables
+        const canvas = document.getElementById('snake-canvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+        const tileSize = canvas.width / gridSize;
+
+        function drawSnake(snake) {
+            ctx.fillStyle = '#4CAF50';
+            snake.forEach(([x, y], index) => {
+                if (index === 0) {
+                    ctx.fillStyle = '#2E7D32';  // Darker green for head
+                } else {
+                    ctx.fillStyle = '#4CAF50';
+                }
+                ctx.fillRect(x * tileSize, y * tileSize, tileSize - 1, tileSize - 1);
+            });
+        }
+
+        function drawFood(food) {
+            ctx.fillStyle = '#FF5252';
+            ctx.beginPath();
+            ctx.arc(
+                (food.x * tileSize) + tileSize/2,
+                (food.y * tileSize) + tileSize/2,
+                tileSize/2 - 1,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = '#1c1c1c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateGame(gameState) {
+            clearCanvas();
+            drawSnake(gameState.snake);
+            drawFood(gameState.food);
+            document.getElementById('snake-score').textContent = `Score: ${gameState.score}`;
+            
+            if (gameState.game_over) {
+                gameEnded = true;
+                document.getElementById('snake-status').innerHTML = 
+                    `<span class="winner">Game Over! Final Score: ${gameState.score}</span>`;
+                document.getElementById('snake-reset').style.display = 'block';
+                clearInterval(snakeGameLoop);
+            }
+        }
+
+        function joinGame(game) {
+            currentGame = game;
+            currentRoom = game + '-' + Math.random().toString(36).substr(2, 9);
+            gameEnded = false;
+            
+            document.querySelectorAll('.game-board').forEach(board => board.style.display = 'none');
+            document.getElementById(game + '-board').style.display = 'block';
+            
+            if (game === 'tictactoe') {
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('disabled');
+                });
+                document.getElementById('tictactoe-reset').style.display = 'none';
+                socket.emit('join_tictactoe', { room: currentRoom });
+            } else if (game === 'snake') {
+                document.getElementById('snake-status').textContent = '';
+                document.getElementById('snake-reset').style.display = 'none';
+                document.getElementById('snake-score').textContent = 'Score: 0';
+                clearCanvas();
+                socket.emit('join_snake', { room: currentRoom });
+                
+                // Start game loop
+                if (snakeGameLoop) clearInterval(snakeGameLoop);
+                snakeGameLoop = setInterval(() => {
+                    if (!gameEnded) {
+                        socket.emit('snake_move', { room: currentRoom });
+                    }
+                }, 100);
+            }
+        }
+
+        function makeMove(position) {
+            if (!gameEnded && currentGame === 'tictactoe') {
+                socket.emit('make_move_tictactoe', {
+                    room: currentRoom,
+                    position: position
+                });
+            }
+        }
+
+        function resetGame(game) {
+            joinGame(game);
+        }
+
+        // Handle keyboard controls for snake
+        document.addEventListener('keydown', (event) => {
+            if (currentGame === 'snake' && !gameEnded) {
+                const key = event.key;
+                let direction = '';
+                
+                if (key === 'ArrowUp') direction = 'UP';
+                else if (key === 'ArrowDown') direction = 'DOWN';
+                else if (key === 'ArrowLeft') direction = 'LEFT';
+                else if (key === 'ArrowRight') direction = 'RIGHT';
+                
+                if (direction) {
+                    socket.emit('snake_direction', {
+                        room: currentRoom,
+                        direction: direction
+                    });
+                }
+            }
+        });
+
+        socket.on('game_joined', (data) => {
+            if (data.game === 'snake') {
+                updateGame(data.gameState);
+            } else {
+                const statusElement = document.getElementById('tictactoe-status');
+                statusElement.textContent = `You are Player ${data.player}`;
+            }
+        });
+
+        socket.on('move_made', (data) => {
+            const cells = document.querySelectorAll('.cell');
+            data.board.forEach((mark, index) => {
+                cells[index].textContent = mark;
+            });
+            
+            if (data.winner) {
+                gameEnded = true;
+                document.getElementById('tictactoe-status').innerHTML = 
+                    `<span class="winner">Winner: ${data.winner}</span>`;
+                document.getElementById('tictactoe-reset').style.display = 'block';
+                cells.forEach(cell => cell.classList.add('disabled'));
+            }
+        });
+
+        socket.on('game_update', (gameState) => {
+            updateGame(gameState);
+        });
+    </script>
+</body>
+</html>
