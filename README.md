@@ -1,16 +1,11 @@
-# Learning Platform for Children
-
-A web-based interactive learning platform designed for children, featuring educational games with a leaderboard system to track progress and encourage engagement.
-
-![Learning Platform for Children](static/background.png)
+# GameHub : A Simple Gaming Platform
+A web-based interactive gaming platform designed for children, featuring games with a leaderboard system to track progress and encourage engagement.
 
 ## 🎮 Features
 
-- **Multiple Educational Games**:
+- **Multiple Games**:
   - Snake Game - Classic snake gameplay with responsive controls
   - Tetris - Block-stacking puzzle game
-  - Number Guessing Game - Simple mental math exercise
-  - Tic Tac Toe - Strategic thinking development
 
 - **User Management**:
   - Secure user registration and login system
@@ -18,12 +13,6 @@ A web-based interactive learning platform designed for children, featuring educa
 
 - **Leaderboard System**:
   - Competitive leaderboards for each game
-  - Encourages children to improve their skills
-  - Historical score tracking
-
-- **Real-time Gameplay**:
-  - WebSocket-based real-time communication
-  - Smooth and responsive gaming experience
 
 ## 🛠️ Technologies Used
 
@@ -88,8 +77,6 @@ A web-based interactive learning platform designed for children, featuring educa
 3. Follow the on-screen instructions for each game:
    - **Snake**: Use arrow keys to control the snake. Eat food to grow and earn points.
    - **Tetris**: Use arrow keys to move and rotate pieces. Complete lines to earn points.
-   - **Number Guessing**: Guess the correct number within the given range.
-   - **Tic Tac Toe**: Classic X and O game - get three in a row to win.
 4. View your scores on the leaderboard and compete with others!
 
 ## 📁 Project Structure
@@ -97,25 +84,5 @@ A web-based interactive learning platform designed for children, featuring educa
 - `server.py` - Main Flask application and game server
 - `models.py` - Database models for user management and score tracking
 - `client.py` - Client-side utilities
-- `tic_tac_toe.py` - Tic Tac Toe game implementation
-- `guess_num.py` - Number guessing game implementation
 - `static/` - Static assets (CSS, JavaScript, images)
 - `templates/` - HTML templates for the web interface
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to fork this repository and submit pull requests.
-
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 📧 Contact
-
-For any questions or feedback, please reach out to [your-email@example.com](mailto:your-email@example.com).
