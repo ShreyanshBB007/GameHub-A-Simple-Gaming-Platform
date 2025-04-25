@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Multi-Game Platform</title>
+    <title>Learning Platform for Children</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -35,8 +35,64 @@
             z-index: 1;
         }
 
-        #game-selection {
+        .category-selection {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin: 80px 0;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .category-button {
+            background: rgba(75, 0, 130, 0.85);  /* Indigo with transparency */
+            color: white;
+            border: none;
+            padding: 80px 60px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.4s ease;
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(75, 0, 130, 0.3);
+        }
+
+        .category-button:first-child {
+            background: rgba(0, 128, 128, 0.85);  /* Teal with transparency */
+            box-shadow: 0 10px 30px rgba(0, 128, 128, 0.3);
+        }
+
+        .category-button:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(75, 0, 130, 0.5);
+        }
+
+        .category-button:first-child:hover {
+            box-shadow: 0 15px 40px rgba(0, 128, 128, 0.5);
+        }
+
+        .category-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        #game-selection {
+            display: none;
             flex-direction: column;
             align-items: center;
             gap: 30px;
@@ -76,6 +132,23 @@
             background: rgba(255, 165, 0, 1);
         }
 
+        .back-button {
+            background: rgba(70, 70, 70, 0.8);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+            background: rgba(100, 100, 100, 0.9);
+            transform: translateY(-3px);
+        }
+
         .game-icon {
             width: 48px;
             height: 48px;
@@ -96,6 +169,10 @@
 
         .icon-snake {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%234CAF50' d='M20 10c0 2-1 3-2 3s-2-1-2-3 1-3 2-3 2 1 2 3zM4 10c0 2 1 3 2 3s2-1 2-3-1-3-2-3-2 1-2 3z'/%3E%3Cpath fill='%234CAF50' d='M12 20c-4 0-8-4-8-10S8 0 12 0s8 4 8 10-4 10-8 10zm0-2c3 0 6-3 6-8s-3-8-6-8-6 3-6 8 3 8 6 8z'/%3E%3Ccircle fill='%23FF5252' cx='16' cy='7' r='1'/%3E%3C/svg%3E");
+        }
+
+        .icon-pong {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill='%23fff' x='2' y='6' width='2' height='12' rx='1' /%3E%3Crect fill='%23fff' x='20' y='6' width='2' height='12' rx='1' /%3E%3Ccircle fill='%23fff' cx='12' cy='12' r='2' /%3E%3C/svg%3E");
         }
 
         .navbar {
@@ -137,107 +214,118 @@
         }
 
         .leaderboard-links {
-            display: flex;
+            display: none;
             justify-content: center;
             gap: 30px;
             margin: 40px 0;
         }
 
         .leaderboard-links a {
-            background: rgba(255, 69, 0, 0.9);  /* Red-Orange with transparency */
+            display: inline-block;
+            padding: 15px 30px;
+            background: rgba(128, 0, 128, 0.7);
             color: white;
             text-decoration: none;
-            padding: 15px 30px;
-            border-radius: 15px;
+            border-radius: 25px;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(255, 69, 0, 0.3);
+            font-weight: bold;
+            backdrop-filter: blur(5px);
         }
 
         .leaderboard-links a:hover {
+            background: rgba(128, 0, 128, 0.9);
             transform: translateY(-3px);
-            background: rgba(255, 69, 0, 1);
-            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        h1, h2 {
-            color: #FFA500;  /* Orange */
+        .game-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #FFA500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+
+        .category-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #FFA500;
             text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Game boards styling */
-        .game-board {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            margin: 30px auto;
-            max-width: 800px;
-            border: 1px solid rgba(255, 165, 0, 0.3);
+        #pong-container, #snake-container, #tetris-container {
             display: none;
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        #snake-canvas, #tetris-canvas {
-            border-radius: 15px;
-            background-color: rgba(0, 0, 0, 0.9);
-            margin: 20px auto;
+        canvas {
             display: block;
-            box-shadow: 0 4px 20px rgba(255, 165, 0, 0.2);
-            border: 2px solid rgba(255, 165, 0, 0.3);
+            background: black;
         }
 
-        .status {
-            color: #FFA500;
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
             text-align: center;
-            margin: 15px 0;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 1.2em;
+            z-index: 10;
         }
 
-        .winner {
-            color: #32CD32;  /* Lime Green */
-            font-size: 1.4em;
-            font-weight: bold;
-            animation: winnerAnimation 1s ease-in-out;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .game-controls {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 165, 0, 0.2);
-        }
-
-        .control-hint {
-            color: #FFA500;
-            margin: 10px 0;
-            font-size: 1em;
-            text-align: center;
-        }
-
-        /* Updated game scores */
-        #snake-score, #tetris-score {
+        #game-over h2 {
+            color: #FF4444;
             font-size: 28px;
-            color: #FFA500;
-            margin: 20px 0;
-            text-align: center;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
         }
 
-        @keyframes winnerAnimation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        #final-score {
+            color: #FFA500;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        #restart-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        #restart-btn:hover {
+            background: #45a049;
+            transform: translateY(-3px);
+        }
+
+        #menu-btn {
+            background: #FF7700;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        #menu-btn:hover {
+            background: #FF5500;
+            transform: translateY(-3px);
         }
     </style>
 </head>
@@ -245,276 +333,871 @@
     <div class="container">
         <div class="navbar">
             <div class="user-info">
-                <span class="username">Welcome, {{ current_user.username }}!</span>
-                <a href="{{ url_for('logout') }}" class="button" id="logout-btn">Logout</a>
+                <div class="username">Welcome, {{ current_user.username }}!</div>
+                <a href="{{ url_for('logout') }}"><button id="logout-btn">Logout</button></a>
             </div>
         </div>
 
-        <h1>Multi-Game Platform</h1>
-        
-        <div id="game-selection">
-            <h2>Select a Game:</h2>
-            <div class="games-grid">
-                <button onclick="joinGame('tetris')" class="game-button">
-                    <span class="game-icon icon-tetris"></span>
-                    Tetris
+        <div class="category-selection" id="main-menu">
+            <h1 class="game-title">Game Platform</h1>
+            <div class="category-buttons">
+                <button class="category-button" id="single-player-btn">
+                    <div class="category-icon">👤</div>
+                    Single Player
                 </button>
-                <button onclick="joinGame('snake')" class="game-button">
-                    <span class="game-icon icon-snake"></span>
-                    Snake Game
+                <button class="category-button" id="multiplayer-btn">
+                    <div class="category-icon">👥</div>
+                    Multiplayer
                 </button>
             </div>
+        </div>
+
+        <div id="game-selection">
+            <h2 class="category-title" id="category-header">Select a Game</h2>
+            <div class="games-grid" id="games-container">
+                <!-- Games will be dynamically added here -->
+            </div>
+            <button class="back-button" id="back-btn">Back to Categories</button>
         </div>
 
         <div class="leaderboard-links">
-            <a href="{{ url_for('leaderboard', game_type='tetris') }}" class="game-button">
-                <span class="game-icon icon-tetris"></span>
-                Tetris Leaderboard
-            </a>
-            <a href="{{ url_for('leaderboard', game_type='snake') }}" class="game-button">
-                <span class="game-icon icon-snake"></span>
-                Snake Leaderboard
-            </a>
+            <a href="{{ url_for('leaderboard', game_type='snake') }}">Snake Leaderboard</a>
+            <a href="{{ url_for('leaderboard', game_type='tetris') }}">Tetris Leaderboard</a>
+            <a href="{{ url_for('leaderboard', game_type='pong') }}">Pong Leaderboard</a>
+            <a href="{{ url_for('leaderboard', game_type='tictactoe') }}">Tic Tac Toe Leaderboard</a>
         </div>
 
-        <div id="tetris-board" class="game-board">
-            <h2>Tetris</h2>
-            <div id="tetris-score">Score: 0</div>
-            <canvas id="tetris-canvas" width="300" height="600"></canvas>
-            <div class="game-controls">
-                <p class="control-hint">Controls:</p>
-                <p class="control-hint">← → : Move left/right</p>
-                <p class="control-hint">↑ : Rotate</p>
-                <p class="control-hint">↓ : Move down</p>
-            </div>
-            <div id="tetris-status" class="status"></div>
-            <button onclick="resetGame('tetris')" id="tetris-reset" style="display: none;">Play Again</button>
+        <div id="snake-container">
+            <canvas id="snake-canvas" width="800" height="600"></canvas>
         </div>
 
-        <div id="snake-board" class="game-board">
-            <h2>Snake Game</h2>
-            <div id="snake-score">Score: 0</div>
-            <canvas id="snake-canvas" width="400" height="400"></canvas>
-            <div id="snake-controls">
-                <p>Use arrow keys to control the snake</p>
-                <button onclick="resetGame('snake')" id="snake-reset" style="display: none;">Play Again</button>
-            </div>
-            <div id="snake-status" class="status"></div>
+        <div id="tetris-container">
+            <canvas id="tetris-canvas" width="800" height="600"></canvas>
         </div>
+
+        <div id="pong-container">
+            <canvas id="pong-canvas" width="800" height="600"></canvas>
+        </div>
+
+        <div id="tictactoe-container" style="display:none; width: 400px; margin: 0 auto; background: rgba(0,0,0,0.8); border-radius: 10px; padding: 30px;">
+            <h2 style="text-align:center; color:#FFA500;">Tic Tac Toe</h2>
+            <div id="tictactoe-status" style="text-align:center; margin-bottom: 10px; color: #fff;"></div>
+            <div id="tictactoe-board" style="display: grid; grid-template-columns: repeat(3, 80px); grid-gap: 5px; justify-content: center; margin-bottom: 15px;"></div>
+            <button id="tictactoe-restart-btn" style="display:none; margin: 0 auto; background: #4CAF50; color: white; padding: 10px 25px; border-radius: 20px; border: none; cursor: pointer; font-size: 16px;">Play Again</button>
+        </div>
+
+        <div id="game-over">
+            <h2>Game Over!</h2>
+            <div id="final-score">Score: 0</div>
+            <button id="restart-btn">Play Again</button>
+            <button id="menu-btn" style="background: #FF7700; color: white; padding: 15px 30px; border-radius: 25px; border: none; cursor: pointer; font-size: 18px; transition: all 0.3s ease; margin-top: 10px;">Return to Menu</button>
+        </div>
+
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@3.1.3/dist/socket.io.min.js"></script>
     <script>
         const socket = io();
-        let currentGame = '';
-        let currentRoom = '';
-        let gameEnded = false;
-        let gameLoop;
+        let currentGame = null;
+        let playerRoom = null;
+        let gameInterval = null;
+        let lastDirection = '';
 
-        // Snake game variables
-        const snakeCanvas = document.getElementById('snake-canvas');
-        const snakeCtx = snakeCanvas.getContext('2d');
-        const gridSize = 20;
-        const snakeTileSize = snakeCanvas.width / gridSize;
+        // Game selection page logic
+        document.getElementById('single-player-btn').addEventListener('click', () => {
+            showGameSelection('single-player');
+        });
 
-        // Tetris game variables
-        const tetrisCanvas = document.getElementById('tetris-canvas');
-        const tetrisCtx = tetrisCanvas.getContext('2d');
-        const blockSize = 30;
+        document.getElementById('multiplayer-btn').addEventListener('click', () => {
+            showGameSelection('multiplayer');
+        });
 
-        function drawTetrisBoard(board, currentPiece, piecePosition) {
-            tetrisCtx.fillStyle = '#1c1c1c';
-            tetrisCtx.fillRect(0, 0, tetrisCanvas.width, tetrisCanvas.height);
+        document.getElementById('back-btn').addEventListener('click', () => {
+            document.getElementById('game-selection').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        });
 
-            // Draw the fixed blocks
-            for(let row = 0; row < board.length; row++) {
-                for(let col = 0; col < board[row].length; col++) {
-                    if(board[row][col]) {
-                        tetrisCtx.fillStyle = '#4CAF50';
-                        tetrisCtx.fillRect(col * blockSize, row * blockSize, blockSize - 1, blockSize - 1);
+        // Add event listeners for game over buttons
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            if (currentGame === 'snake') {
+                restartSnakeGame();
+            } else if (currentGame === 'tetris') {
+                restartTetrisGame();
+            } else if (currentGame === 'pong') {
+                resetGame(); // For pong, just reset to menu
+            }
+        });
+
+        document.getElementById('menu-btn').addEventListener('click', returnToMainMenu);
+
+        function returnToMainMenu() {
+            // Hide game over screen
+            document.getElementById('game-over').style.display = 'none';
+            
+            // Hide game containers
+            document.getElementById('snake-container').style.display = 'none';
+            document.getElementById('tetris-container').style.display = 'none';
+            document.getElementById('pong-container').style.display = 'none';
+            document.getElementById('tictactoe-container').style.display = 'none';
+            
+            // Hide leaderboard links
+            document.querySelector('.leaderboard-links').style.display = 'none';
+            
+            // Show main menu
+            document.getElementById('main-menu').style.display = 'flex';
+            
+            // Clear any existing intervals
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+        }
+
+        function showGameSelection(category) {
+            const gamesContainer = document.getElementById('games-container');
+            const categoryHeader = document.getElementById('category-header');
+            
+            // Clear previous games
+            gamesContainer.innerHTML = '';
+            
+            if (category === 'single-player') {
+                categoryHeader.textContent = 'Single Player Games';
+                
+                // Add Snake game button
+                const snakeButton = createGameButton('snake', 'Snake', 'icon-snake');
+                gamesContainer.appendChild(snakeButton);
+                
+                // Add Tetris game button
+                const tetrisButton = createGameButton('tetris', 'Tetris', 'icon-tetris');
+                gamesContainer.appendChild(tetrisButton);
+            } else {
+                categoryHeader.textContent = 'Multiplayer Games';
+                
+                // Add Pong game button
+                const pongButton = createGameButton('pong', 'Pong', 'icon-pong');
+                gamesContainer.appendChild(pongButton);
+                
+                // Add Tic Tac Toe game button
+                const tttButton = createGameButton('tictactoe', 'Tic Tac Toe', '');
+                gamesContainer.appendChild(tttButton);
+            }
+            
+            // Show game selection
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('game-selection').style.display = 'flex';
+        }
+
+        function createGameButton(gameId, gameName, iconClass) {
+            const button = document.createElement('button');
+            button.className = 'game-button';
+            button.dataset.game = gameId;
+            
+            const icon = document.createElement('span');
+            icon.className = `game-icon ${iconClass}`;
+            
+            button.appendChild(icon);
+            button.appendChild(document.createTextNode(gameName));
+            
+            button.addEventListener('click', () => startGame(gameId));
+            
+            return button;
+        }
+
+        function startGame(gameId) {
+            currentGame = gameId;
+            playerRoom = `${gameId}_${Date.now()}`;
+            
+            // Hide menus
+            document.getElementById('game-selection').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'none';
+            
+            // Show leaderboard links
+            document.querySelector('.leaderboard-links').style.display = 'flex';
+            
+            // Show relevant game container
+            document.getElementById(`${gameId}-container`).style.display = 'block';
+            
+            // Start specific game
+            if (gameId === 'snake') {
+                initSnakeGame();
+            } else if (gameId === 'tetris') {
+                initTetrisGame();
+            } else if (gameId === 'pong') {
+                initPongGame();
+            } else if (gameId === 'tictactoe') {
+                initTicTacToeGame();
+            }
+        }
+
+        // Snake Game Logic
+        function initSnakeGame() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            socket.emit('join_snake', { room: playerRoom });
+            
+            let snake = [];
+            let food = null;
+            let score = 0;
+            let gameOver = false;
+            lastDirection = '';
+            
+            // Remove any existing event listeners to prevent duplicates
+            document.removeEventListener('keydown', handleSnakeControls);
+            document.addEventListener('keydown', handleSnakeControls);
+            
+            function handleSnakeControls(e) {
+                let direction = '';
+                switch(e.key) {
+                    case 'ArrowUp':
+                        direction = 'UP';
+                        break;
+                    case 'ArrowDown':
+                        direction = 'DOWN';
+                        break;
+                    case 'ArrowLeft':
+                        direction = 'LEFT';
+                        break;
+                    case 'ArrowRight':
+                        direction = 'RIGHT';
+                        break;
+                }
+                
+                if (direction && !gameOver) {
+                    // Prevent 180-degree turns
+                    if ((lastDirection === 'UP' && direction === 'DOWN') ||
+                        (lastDirection === 'DOWN' && direction === 'UP') ||
+                        (lastDirection === 'LEFT' && direction === 'RIGHT') ||
+                        (lastDirection === 'RIGHT' && direction === 'LEFT')) {
+                        // Don't allow 180-degree turns
+                        return;
                     }
+                    
+                    lastDirection = direction;
+                    socket.emit('snake_direction', {
+                        room: playerRoom,
+                        direction: direction
+                    });
                 }
             }
+            
+            socket.on('game_joined', (data) => {
+                if (data.game === 'snake') {
+                    snake = data.gameState.snake;
+                    food = data.gameState.food;
+                    score = data.gameState.score;
+                    lastDirection = data.gameState.direction;
+                    gameOver = false;
+                    
+                    // Clear any existing interval
+                    if (gameInterval) {
+                        clearInterval(gameInterval);
+                    }
+                    
+                    // Start game loop with fixed speed
+                    gameInterval = setInterval(() => {
+                        if (!gameOver) {
+                            socket.emit('snake_move', { room: playerRoom });
+                        }
+                    }, 200); // Fixed speed of 200ms
+                }
+            });
+            
+            socket.on('game_update', (data) => {
+                snake = data.snake;
+                food = data.food;
+                score = data.score;
+                gameOver = data.game_over;
+                
+                // Draw game
+                drawSnakeGame();
+                
+                if (gameOver) {
+                    clearInterval(gameInterval);
+                    socket.emit('update_score', {
+                        game_type: 'snake',
+                        score: score
+                    });
+                    showGameOver(score);
+                }
+            });
+            
+            function drawSnakeGame() {
+                // Clear canvas
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw border
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw game grid (optional, for better visualization)
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 0.5;
+                for (let x = 0; x < canvas.width; x += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < canvas.height; y += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+                
+                // Draw snake
+                ctx.fillStyle = 'green';
+                snake.forEach(part => {
+                    ctx.fillRect(part[0] * 20, part[1] * 20, 20, 20);
+                });
+                
+                // Draw food
+                if (food) {
+                    ctx.fillStyle = 'red';
+                    ctx.beginPath();
+                    ctx.arc((food.x * 20) + 10, (food.y * 20) + 10, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // Draw score
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.fillText(`Score: ${score}`, 10, 30);
+            }
+        }
+        
+        function restartSnakeGame() {
+            // Hide game over screen
+            document.getElementById('game-over').style.display = 'none';
+            
+            // Send restart signal to server
+            socket.emit('restart_snake', { room: playerRoom });
+            
+            // Game will be reinitialized with the game_joined event
+        }
 
-            // Draw the current piece
-            if(currentPiece && piecePosition) {
-                tetrisCtx.fillStyle = '#2196F3';
-                for(let row = 0; row < currentPiece.length; row++) {
-                    for(let col = 0; col < currentPiece[row].length; col++) {
-                        if(currentPiece[row][col]) {
-                            tetrisCtx.fillRect(
-                                (piecePosition[1] + col) * blockSize,
-                                (piecePosition[0] + row) * blockSize,
-                                blockSize - 1,
-                                blockSize - 1
+        // Tetris Game Logic
+        function initTetrisGame() {
+            const canvas = document.getElementById('tetris-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            socket.emit('join_tetris', { room: playerRoom });
+            
+            let board = [];
+            let currentPiece = null;
+            let piecePosition = [0, 0];
+            let score = 0;
+            let gameOver = false;
+            
+            // Remove any existing event listeners to prevent duplicates
+            document.removeEventListener('keydown', handleTetrisControls);
+            
+            function handleTetrisControls(e) {
+                if (gameOver) return;
+                
+                let move = '';
+                switch(e.key) {
+                    case 'ArrowUp':
+                        move = 'rotate';
+                        break;
+                    case 'ArrowDown':
+                        move = 'down';
+                        break;
+                    case 'ArrowLeft':
+                        move = 'left';
+                        break;
+                    case 'ArrowRight':
+                        move = 'right';
+                        break;
+                    case ' ':  // Space bar for hard drop
+                        move = 'down';
+                        break;
+                }
+                
+                if (move) {
+                    socket.emit('tetris_move', {
+                        room: playerRoom,
+                        move: move
+                    });
+                }
+            }
+            
+            // Only add the event listener once per game session
+            setTimeout(() => {
+                document.removeEventListener('keydown', handleTetrisControls);
+                document.addEventListener('keydown', handleTetrisControls);
+            }, 100);
+            
+            socket.on('game_joined', (data) => {
+                if (data.game === 'tetris') {
+                    board = data.gameState.board;
+                    currentPiece = data.gameState.current_piece;
+                    piecePosition = data.gameState.piece_position;
+                    score = data.gameState.score;
+                    gameOver = false;
+                    
+                    // Clear any existing interval
+                    if (gameInterval) {
+                        clearInterval(gameInterval);
+                    }
+                    
+                    // Start game loop
+                    gameInterval = setInterval(() => {
+                        if (!gameOver) {
+                            socket.emit('tetris_move', { 
+                                room: playerRoom,
+                                move: 'down'
+                            });
+                        }
+                    }, 1000);
+                    
+                    // Initial draw
+                    drawTetrisGame();
+                }
+            });
+            
+            socket.on('game_update', (data) => {
+                // Always use server state
+                board = data.board;
+                currentPiece = data.current_piece;
+                piecePosition = data.piece_position;
+                score = data.score;
+                gameOver = data.game_over;
+                
+                // Draw game
+                drawTetrisGame();
+                
+                if (gameOver) {
+                    clearInterval(gameInterval);
+                    socket.emit('update_score', {
+                        game_type: 'tetris',
+                        score: score
+                    });
+                    showGameOver(score);
+                }
+            });
+            
+            function drawTetrisGame() {
+                // Clear canvas
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw board
+                const blockSize = 30;
+                const offsetX = (canvas.width - blockSize * 10) / 2;
+                const offsetY = 20;
+                
+                // Draw grid
+                ctx.strokeStyle = '#333';
+                for (let row = 0; row < 20; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        ctx.strokeRect(
+                            offsetX + col * blockSize,
+                            offsetY + row * blockSize,
+                            blockSize,
+                            blockSize
+                        );
+                    }
+                }
+                
+                // Draw placed blocks
+                for (let row = 0; row < 20; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        if (board[row] && board[row][col]) {
+                            ctx.fillStyle = '#607D8B';
+                            ctx.fillRect(
+                                offsetX + col * blockSize,
+                                offsetY + row * blockSize,
+                                blockSize,
+                                blockSize
+                            );
+                            // Draw border for the block
+                            ctx.strokeStyle = '#455A64';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(
+                                offsetX + col * blockSize,
+                                offsetY + row * blockSize,
+                                blockSize,
+                                blockSize
                             );
                         }
                     }
                 }
-            }
-        }
-
-        function joinGame(game) {
-            currentGame = game;
-            currentRoom = game + '-' + Math.random().toString(36).substr(2, 9);
-            gameEnded = false;
-            
-            document.querySelectorAll('.game-board').forEach(board => board.style.display = 'none');
-            document.getElementById(game + '-board').style.display = 'block';
-            
-            if (game === 'tetris') {
-                document.getElementById('tetris-status').textContent = '';
-                document.getElementById('tetris-reset').style.display = 'none';
-                document.getElementById('tetris-score').textContent = 'Score: 0';
-                socket.emit('join_tetris', { room: currentRoom });
                 
-                // Start game loop for automatic piece descent
-                if (gameLoop) clearInterval(gameLoop);
-                gameLoop = setInterval(() => {
-                    if (!gameEnded) {
-                        socket.emit('tetris_move', { 
-                            room: currentRoom,
-                            move: 'down'
-                        });
-                    }
-                }, 1000);
-            } else if (game === 'snake') {
-                document.getElementById('snake-status').textContent = '';
-                document.getElementById('snake-reset').style.display = 'none';
-                document.getElementById('snake-score').textContent = 'Score: 0';
-                clearCanvas(snakeCtx, snakeCanvas);
-                socket.emit('join_snake', { room: currentRoom });
-                
-                if (gameLoop) clearInterval(gameLoop);
-                gameLoop = setInterval(() => {
-                    if (!gameEnded) {
-                        socket.emit('snake_move', { room: currentRoom });
-                    }
-                }, 100);
-            }
-        }
-
-        // Handle keyboard controls
-        document.addEventListener('keydown', (event) => {
-            if (!gameEnded) {
-                if (currentGame === 'snake') {
-                    const key = event.key;
-                    let direction = '';
-                    
-                    if (key === 'ArrowUp') direction = 'UP';
-                    else if (key === 'ArrowDown') direction = 'DOWN';
-                    else if (key === 'ArrowLeft') direction = 'LEFT';
-                    else if (key === 'ArrowRight') direction = 'RIGHT';
-                    
-                    if (direction) {
-                        socket.emit('snake_direction', {
-                            room: currentRoom,
-                            direction: direction
-                        });
-                    }
-                } else if (currentGame === 'tetris') {
-                    const key = event.key;
-                    let move = '';
-                    
-                    if (key === 'ArrowLeft') move = 'left';
-                    else if (key === 'ArrowRight') move = 'right';
-                    else if (key === 'ArrowDown') move = 'down';
-                    else if (key === 'ArrowUp') move = 'rotate';
-                    
-                    if (move) {
-                        socket.emit('tetris_move', {
-                            room: currentRoom,
-                            move: move
-                        });
+                // Draw current piece
+                if (currentPiece && piecePosition) {
+                    ctx.fillStyle = '#FF9800';
+                    for (let row = 0; row < currentPiece.length; row++) {
+                        for (let col = 0; col < currentPiece[0].length; col++) {
+                            if (currentPiece[row][col]) {
+                                ctx.fillRect(
+                                    offsetX + (piecePosition[1] + col) * blockSize,
+                                    offsetY + (piecePosition[0] + row) * blockSize,
+                                    blockSize,
+                                    blockSize
+                                );
+                                // Draw border for the block
+                                ctx.strokeStyle = '#E65100';
+                                ctx.lineWidth = 2;
+                                ctx.strokeRect(
+                                    offsetX + (piecePosition[1] + col) * blockSize,
+                                    offsetY + (piecePosition[0] + row) * blockSize,
+                                    blockSize,
+                                    blockSize
+                                );
+                            }
+                        }
                     }
                 }
+                
+                // Draw score
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.fillText(`Score: ${score}`, 10, 30);
             }
-        });
-
-        function resetGame(game) {
-            joinGame(game);
         }
 
-        socket.on('game_joined', (data) => {
-            if (data.game === 'tetris') {
-                drawTetrisBoard(data.gameState.board, data.gameState.current_piece, data.gameState.piece_position);
-            } else if (data.game === 'snake') {
-                updateSnakeGame(data.gameState);
-            }
-        });
+        function restartTetrisGame() {
+            document.getElementById('game-over').style.display = 'none';
+            socket.emit('restart_tetris', { room: playerRoom });
+            // Game will be reinitialized with the game_joined event
+        }
 
-        socket.on('game_error', (data) => {
-            document.getElementById('tictactoe-status').textContent = data.message;
-        });
-
-        socket.on('game_update', (gameState) => {
-            if (currentGame === 'tetris') {
-                drawTetrisBoard(gameState.board, gameState.current_piece, gameState.piece_position);
-                document.getElementById('tetris-score').textContent = `Score: ${gameState.score}`;
-                
-                if (gameState.game_over) {
-                    gameEnded = true;
-                    document.getElementById('tetris-status').innerHTML = 
-                        `<span class="winner">Game Over! Final Score: ${gameState.score}</span>`;
-                    document.getElementById('tetris-reset').style.display = 'block';
-                    clearInterval(gameLoop);
-                    socket.emit('update_score', {
-                        game_type: 'tetris',
-                        score: gameState.score
-                    });
-                }
-            } else if (currentGame === 'snake') {
-                updateSnakeGame(gameState);
-            }
-        });
-
-        function updateSnakeGame(gameState) {
-            clearCanvas(snakeCtx, snakeCanvas);
-            drawSnake(gameState.snake);
-            drawFood(gameState.food);
-            document.getElementById('snake-score').textContent = `Score: ${gameState.score}`;
+        // Pong Game Logic
+        function initPongGame() {
+            const canvas = document.getElementById('pong-canvas');
+            const ctx = canvas.getContext('2d');
             
-            if (gameState.game_over) {
-                gameEnded = true;
-                document.getElementById('snake-status').innerHTML = 
-                    `<span class="winner">Game Over! Final Score: ${gameState.score}</span>`;
-                document.getElementById('snake-reset').style.display = 'block';
-                clearInterval(gameLoop);
+            // Local multiplayer variables
+            let ball = {
+                x: 400,  // Center of the canvas
+                y: 300,
+                dx: 5,   // Ball speed in x direction
+                dy: 5,   // Ball speed in y direction
+                radius: 10
+            };
+            
+            let paddles = {
+                left: { y: 250, height: 100, speed: 10 },   // Left paddle
+                right: { y: 250, height: 100, speed: 10 }   // Right paddle
+            };
+            
+            let scores = { left: 0, right: 0 };
+            let gameStarted = true;
+            let keysPressed = {};
+            
+            // Set up keyboard controls for both players
+            document.addEventListener('keydown', function(e) {
+                keysPressed[e.key] = true;
+            });
+            
+            document.addEventListener('keyup', function(e) {
+                keysPressed[e.key] = false;
+            });
+            
+            // Game loop
+            gameInterval = setInterval(updatePongGame, 16); // ~60fps
+            
+            function updatePongGame() {
+                // Process player inputs
+                // Player 1 (W and S)
+                if (keysPressed['w'] || keysPressed['W']) {
+                    paddles.left.y = Math.max(0, paddles.left.y - paddles.left.speed);
+                }
+                if (keysPressed['s'] || keysPressed['S']) {
+                    paddles.left.y = Math.min(canvas.height - paddles.left.height, paddles.left.y + paddles.left.speed);
+                }
+                
+                // Player 2 (Arrow Up and Down)
+                if (keysPressed['ArrowUp']) {
+                    paddles.right.y = Math.max(0, paddles.right.y - paddles.right.speed);
+                }
+                if (keysPressed['ArrowDown']) {
+                    paddles.right.y = Math.min(canvas.height - paddles.right.height, paddles.right.y + paddles.right.speed);
+                }
+                
+                // Update ball position
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+                
+                // Handle collisions with top and bottom walls
+                if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= canvas.height) {
+                    ball.dy = -ball.dy;
+                }
+                
+                // Handle collisions with paddles
+                // Left paddle collision
+                if (ball.x - ball.radius <= 20 && ball.y >= paddles.left.y && ball.y <= paddles.left.y + paddles.left.height) {
+                    ball.dx = -ball.dx;
+                    // Adjust angle based on where the ball hits the paddle
+                    ball.dy += (ball.y - (paddles.left.y + paddles.left.height / 2)) * 0.1;
+                }
+                
+                // Right paddle collision
+                if (ball.x + ball.radius >= canvas.width - 20 && ball.y >= paddles.right.y && ball.y <= paddles.right.y + paddles.right.height) {
+                    ball.dx = -ball.dx;
+                    // Adjust angle based on where the ball hits the paddle
+                    ball.dy += (ball.y - (paddles.right.y + paddles.right.height / 2)) * 0.1;
+                }
+                
+                // Check for scoring
+                if (ball.x - ball.radius <= 0) {
+                    // Right player scores
+                    scores.right += 1;
+                    resetBall();
+                } else if (ball.x + ball.radius >= canvas.width) {
+                    // Left player scores
+                    scores.left += 1;
+                    resetBall();
+                }
+                
+                // Check if game is over (one player reached 5 points)
+                if (scores.left >= 5 || scores.right >= 5) {
+                    clearInterval(gameInterval);
+                    const winner = scores.left >= 5 ? "Player 1" : "Player 2";
+                    showGameWin(winner, scores.left, scores.right);
+                    return;
+                }
+                
+                // Draw the game
+                drawPongGame();
+            }
+            
+            function resetBall() {
+                // Reset ball to center with random direction
+                ball.x = canvas.width / 2;
+                ball.y = canvas.height / 2;
+                ball.dx = (Math.random() > 0.5 ? 5 : -5);
+                ball.dy = (Math.random() > 0.5 ? 5 : -5);
+            }
+            
+            function drawPongGame() {
+                // Clear canvas
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw center line
+                ctx.strokeStyle = 'white';
+                ctx.setLineDash([10, 15]);
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, 0);
+                ctx.lineTo(canvas.width / 2, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw paddles
+                ctx.fillStyle = 'white';
+                // Left paddle
+                ctx.fillRect(0, paddles.left.y, 20, paddles.left.height);
+                // Right paddle
+                ctx.fillRect(canvas.width - 20, paddles.right.y, 20, paddles.right.height);
+                
+                // Draw ball
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw scores
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                // Left player score
+                ctx.fillText(scores.left.toString(), canvas.width / 4, 50);
+                // Right player score
+                ctx.fillText(scores.right.toString(), (canvas.width / 4) * 3, 50);
+                
+                // Draw players label
+                ctx.font = '20px Arial';
+                ctx.fillText('Player 1 (W/S)', canvas.width / 4, 80);
+                ctx.fillText('Player 2 (↑/↓)', (canvas.width / 4) * 3, 80);
+            }
+            
+            function showGameWin(winner, score1, score2) {
+                const gameOverDiv = document.getElementById('game-over');
+                const finalScoreDiv = document.getElementById('final-score');
+                document.querySelector('#game-over h2').textContent = `${winner} Wins!`;
+                finalScoreDiv.textContent = `Score: ${score1} - ${score2}`;
+                gameOverDiv.style.display = 'block';
+                // Emit score to server for leaderboard
+                let playerScore = winner === "Player 1" ? score1 : score2;
                 socket.emit('update_score', {
-                    game_type: 'snake',
-                    score: gameState.score
+                    game_type: 'pong',
+                    score: playerScore
+                });
+                document.getElementById('restart-btn').addEventListener('click', () => {
+                    resetGame();
                 });
             }
         }
 
-        function drawSnake(snake) {
-            snakeCtx.fillStyle = '#4CAF50';
-            snake.forEach(([x, y], index) => {
-                if (index === 0) {
-                    snakeCtx.fillStyle = '#2E7D32';  // Darker green for head
-                } else {
-                    snakeCtx.fillStyle = '#4CAF50';
-                }
-                snakeCtx.fillRect(x * snakeTileSize, y * snakeTileSize, snakeTileSize - 1, snakeTileSize - 1);
+        function showGameOver(score) {
+            document.getElementById('game-over').style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+        }
+        
+        function showGameWon(playerScore, opponentScore) {
+            const gameOverDiv = document.getElementById('game-over');
+            const finalScoreDiv = document.getElementById('final-score');
+            
+            document.querySelector('#game-over h2').textContent = 'You Win!';
+            finalScoreDiv.textContent = `Score: ${playerScore} - ${opponentScore}`;
+            gameOverDiv.style.display = 'block';
+            
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                resetGame();
             });
         }
-
-        function drawFood(food) {
-            snakeCtx.fillStyle = '#FF5252';
-            snakeCtx.beginPath();
-            snakeCtx.arc(
-                (food.x * snakeTileSize) + snakeTileSize/2,
-                (food.y * snakeTileSize) + snakeTileSize/2,
-                snakeTileSize/2 - 1,
-                0,
-                Math.PI * 2
-            );
-            snakeCtx.fill();
+        
+        function showGameLost(playerScore, opponentScore) {
+            const gameOverDiv = document.getElementById('game-over');
+            const finalScoreDiv = document.getElementById('final-score');
+            
+            document.querySelector('#game-over h2').textContent = 'You Lost!';
+            finalScoreDiv.textContent = `Score: ${playerScore} - ${opponentScore}`;
+            gameOverDiv.style.display = 'block';
+            
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                resetGame();
+            });
+        }
+        
+        function resetGame() {
+            // Hide game over
+            document.getElementById('game-over').style.display = 'none';
+            
+            // Hide game containers
+            document.getElementById('snake-container').style.display = 'none';
+            document.getElementById('tetris-container').style.display = 'none';
+            document.getElementById('pong-container').style.display = 'none';
+            document.getElementById('tictactoe-container').style.display = 'none';
+            
+            // Show main menu
+            document.getElementById('main-menu').style.display = 'flex';
+            
+            // Hide leaderboard links
+            document.querySelector('.leaderboard-links').style.display = 'none';
+            
+            // Clear any intervals
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            // Reset game state
+            if (currentGame === 'pong') {
+                // Instead of returning to menu, restart Pong
+                document.getElementById('main-menu').style.display = 'none';
+                document.getElementById('pong-container').style.display = 'block';
+                initPongGame();
+                return;
+            }
+            if (currentGame === 'tictactoe') {
+                document.getElementById('main-menu').style.display = 'none';
+                document.getElementById('tictactoe-container').style.display = 'block';
+                initTicTacToeGame();
+                return;
+            }
+            currentGame = null;
+            playerRoom = null;
         }
 
-        function clearCanvas(ctx, canvas) {
-            ctx.fillStyle = '#1c1c1c';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Initialize restart button event listener
+        document.getElementById('restart-btn').addEventListener('click', resetGame);
+
+        // Remove old event listener for restart-btn to avoid duplicate handlers
+        document.getElementById('restart-btn').replaceWith(document.getElementById('restart-btn').cloneNode(true));
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            if (currentGame === 'snake') {
+                restartSnakeGame();
+            } else if (currentGame === 'tetris') {
+                restartTetrisGame();
+            } else if (currentGame === 'pong') {
+                resetGame();
+            }
+        });
+
+        socket.on('leaderboard_update', (data) => {
+            console.log('Leaderboard updated:', data.scores);
+        });
+
+        // --- Tic Tac Toe Game Logic ---
+        function initTicTacToeGame() {
+            const boardDiv = document.getElementById('tictactoe-board');
+            const statusDiv = document.getElementById('tictactoe-status');
+            const restartBtn = document.getElementById('tictactoe-restart-btn');
+            let board = [[null, null, null], [null, null, null], [null, null, null]];
+            let turn = 0; // 0 for X, 1 for O
+            let winner = null;
+            let draw = false;
+            restartBtn.style.display = 'none';
+            boardDiv.innerHTML = '';
+            statusDiv.textContent = `Player 1's turn (X)`;
+
+            function renderBoard() {
+                boardDiv.innerHTML = '';
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 3; c++) {
+                        const cell = document.createElement('div');
+                        cell.style.width = '80px';
+                        cell.style.height = '80px';
+                        cell.style.background = 'rgba(255,255,255,0.1)';
+                        cell.style.display = 'flex';
+                        cell.style.alignItems = 'center';
+                        cell.style.justifyContent = 'center';
+                        cell.style.fontSize = '48px';
+                        cell.style.cursor = board[r][c] || winner || draw ? 'default' : 'pointer';
+                        cell.style.border = '2px solid #FFA500';
+                        cell.textContent = board[r][c] || '';
+                        if (!board[r][c] && !winner && !draw) {
+                            cell.addEventListener('click', () => {
+                                board[r][c] = turn === 0 ? 'X' : 'O';
+                                if (checkWinner(board)) {
+                                    winner = turn === 0 ? 'X' : 'O';
+                                } else if (isDraw(board)) {
+                                    draw = true;
+                                } else {
+                                    turn = 1 - turn;
+                                }
+                                renderBoard();
+                            });
+                        }
+                        boardDiv.appendChild(cell);
+                    }
+                }
+                if (winner) {
+                    statusDiv.textContent = `Player ${winner === 'X' ? 1 : 2} (${winner}) wins!`;
+                    restartBtn.style.display = 'block';
+                } else if (draw) {
+                    statusDiv.textContent = 'Draw!';
+                    restartBtn.style.display = 'block';
+                } else {
+                    statusDiv.textContent = `Player ${turn + 1}'s turn (${turn === 0 ? 'X' : 'O'})`;
+                    restartBtn.style.display = 'none';
+                }
+            }
+            function checkWinner(b) {
+                for (let i = 0; i < 3; i++) {
+                    if (b[i][0] && b[i][0] === b[i][1] && b[i][1] === b[i][2]) return true;
+                    if (b[0][i] && b[0][i] === b[1][i] && b[1][i] === b[2][i]) return true;
+                }
+                if (b[0][0] && b[0][0] === b[1][1] && b[1][1] === b[2][2]) return true;
+                if (b[0][2] && b[0][2] === b[1][1] && b[1][1] === b[2][0]) return true;
+                return false;
+            }
+            function isDraw(b) {
+                return b.flat().every(cell => cell !== null) && !checkWinner(b);
+            }
+            restartBtn.onclick = function() {
+                board = [[null, null, null], [null, null, null], [null, null, null]];
+                turn = 0;
+                winner = null;
+                draw = false;
+                restartBtn.style.display = 'none';
+                renderBoard();
+            };
+            renderBoard();
         }
     </script>
 </body>
