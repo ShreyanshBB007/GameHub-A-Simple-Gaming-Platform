@@ -1,88 +1,145 @@
-# GameHub : A Simple Gaming Platform
-A web-based interactive gaming platform designed for children, featuring games with a leaderboard system to track progress and encourage engagement.
+# GameHub: A Simple Gaming Platform
 
-## 🎮 Features
+GameHub is a web-based interactive gaming platform designed for children and casual users. It features a collection of classic games—Snake, Tetris, Pong, and Tic Tac Toe—with both single-player and real-time multiplayer modes. The platform includes secure user authentication, persistent leaderboards, and a modern, responsive interface.
 
-- **Multiple Games**:
-  - Snake Game - Classic snake gameplay with responsive controls
-  - Tetris - Block-stacking puzzle game
+---
 
-- **User Management**:
-  - Secure user registration and login system
-  - Personal profiles to track individual progress
+## 🚀 Features
 
-- **Leaderboard System**:
-  - Competitive leaderboards for each game
+- **Multiple Games:**
+  - **Snake** (Single Player): Classic snake gameplay with real-time controls and scoring.
+  - **Tetris** (Single Player): Block-stacking puzzle game with line-clearing and increasing difficulty.
+  - **Pong** (Multiplayer): Two-player real-time Pong with keyboard controls and score tracking.
+  - **Tic Tac Toe** (Multiplayer): Two-player Tic Tac Toe with real-time updates and win/draw detection.
+
+- **User Management:**
+  - Secure registration and login (passwords hashed, session-based authentication).
+  - User profiles with personal score history.
+
+- **Leaderboard System:**
+  - Persistent, per-game leaderboards showing top scores and player rankings.
+  - Leaderboards update in real time as games finish.
+
+- **Real-Time Multiplayer:**
+  - Multiplayer games use WebSockets (Flask-SocketIO) for instant updates and smooth gameplay.
+
+- **Modern UI:**
+  - Responsive HTML5/CSS3 interface with dynamic game selection and in-browser gameplay.
+
+---
 
 ## 🛠️ Technologies Used
 
-- **Backend**:
-  - Flask - Python web framework
-  - Flask-SocketIO - For real-time communication
-  - SQLAlchemy - ORM for database management
-  - Flask-Login - User authentication
+- **Backend:**
+  - Flask (Python web framework)
+  - Flask-SocketIO (real-time communication)
+  - Flask-Login (user authentication)
+  - Flask-SQLAlchemy (ORM for database management)
+  - Gevent (asynchronous server)
+- **Frontend:**
+  - HTML5, CSS3, JavaScript (with Canvas for games)
+- **Database:**
+  - SQLite (stores users, scores, and leaderboards)
 
-- **Frontend**:
-  - HTML5, CSS3, JavaScript
-  - Responsive design for various devices
-
-- **Database**:
-  - SQLite - Lightweight database for storing user data and scores
+---
 
 ## 📋 Requirements
 
 - Python 3.7+
-- Dependencies listed in `requirements.txt`
+- See `requirements.txt` for dependencies
 
-## ⚙️ Installation
+---
 
-1. Clone the repository:
+## ⚙️ Installation & Setup
+
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/Learning-Platform-for-Children.git
-   cd Learning-Platform-for-Children
+   git clone <your-repo-url>
+   cd GameHub-A-Simple-Gaming-Platform
    ```
-
-2. Create and activate a virtual environment (optional but recommended):
+2. **Create and activate a virtual environment (recommended):**
    ```bash
-   # Windows
    python -m venv venv
-   venv\Scripts\activate
-
-   # Linux/macOS
-   python -m venv venv
-   source venv/bin/activate
+   venv\Scripts\activate  # On Windows
+   # or
+   source venv/bin/activate  # On Linux/macOS
    ```
-
-3. Install the required dependencies:
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
-
-4. Initialize the database:
-   ```bash
-   # The database will be automatically created when you run the application
-   ```
-
-5. Run the application:
+4. **Run the application:**
    ```bash
    python server.py
    ```
+5. **Access the app:**
+   Open your browser to [http://localhost:5000](http://localhost:5000)
 
-6. Access the application in your web browser at [http://localhost:5000](http://localhost:5000)
+*The database (`gameplatform.db`) is created automatically on first run.*
 
-## 🎯 How to Play
+---
 
-1. Register an account or log in if you already have one
-2. Select a game from the main menu
-3. Follow the on-screen instructions for each game:
-   - **Snake**: Use arrow keys to control the snake. Eat food to grow and earn points.
-   - **Tetris**: Use arrow keys to move and rotate pieces. Complete lines to earn points.
-4. View your scores on the leaderboard and compete with others!
+## 🕹️ How to Play
 
-## 📁 Project Structure
+1. **Register** a new account or **log in** with existing credentials.
+2. **Choose a game** from the main menu:
+   - **Single Player:** Snake, Tetris
+   - **Multiplayer:** Pong, Tic Tac Toe
+3. **Game Controls:**
+   - **Snake:** Arrow keys to move. Eat food, avoid walls and yourself.
+   - **Tetris:** Arrow keys to move/rotate, space for hard drop.
+   - **Pong:**
+     - Player 1: W/S keys (left paddle)
+     - Player 2: Up/Down arrows (right paddle)
+   - **Tic Tac Toe:** Click to place your mark. First to 3 in a row wins.
+4. **Leaderboard:**
+   - View top scores for each game via the leaderboard links.
+   - Scores update in real time after each game.
 
-- `server.py` - Main Flask application and game server
-- `models.py` - Database models for user management and score tracking
-- `client.py` - Client-side utilities
-- `static/` - Static assets (CSS, JavaScript, images)
-- `templates/` - HTML templates for the web interface
+---
+
+## 🗂️ Project Structure
+
+- `server.py` — Main Flask app, game logic, SocketIO events, and routes.
+- `models.py` — SQLAlchemy models for `User` and `Score`, leaderboard queries.
+- `requirements.txt` — Python dependencies.
+- `static/` — Static assets (images, CSS, JS, background).
+- `templates/` — HTML templates for all pages (login, register, index, leaderboard).
+- `instance/gameplatform.db` — SQLite database (auto-generated).
+
+---
+
+## 🧩 Database Schema
+
+- **User**: Stores username and hashed password.
+- **Score**: Stores user, game type, score, and date. Used for leaderboards.
+- **Leaderboard**: Top scores per game, queried dynamically.
+
+---
+
+## 🔒 Security & Authentication
+
+- Passwords are securely hashed (Werkzeug).
+- User sessions managed with Flask-Login.
+- Only authenticated users can access games and leaderboards.
+
+---
+
+## 🌐 Real-Time & Multiplayer
+
+- Multiplayer games (Pong, Tic Tac Toe) use SocketIO rooms for real-time, two-player matches.
+- Game state is synchronized between clients and server for fairness and responsiveness.
+
+---
+
+## 📑 For Reports & Documentation
+
+This README provides a detailed overview of the platform's features, architecture, and usage. It can be used as a prompt for generating technical reports, user guides, or presentations about the project.
+
+---
+
+## 📞 Contact & Contributions
+
+For questions, suggestions, or contributions, please open an issue or submit a pull request.
+
+---
